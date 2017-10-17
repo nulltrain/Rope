@@ -1,0 +1,17 @@
+{
+    "name": "nulltrain/rope",
+    "authors": [
+        {
+            "name": "Matt Bannon",
+            "email": "matt@ttam.org"
+        },
+        {
+            "name": "Kyle Murphy",
+            "email": "noevidenz@gmail.com"
+        }
+    ],
+    "require": {},
+    "require-dev": {
+        "phpunit/phpunit": "^6.2"
+    }
+}
