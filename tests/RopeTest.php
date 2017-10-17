@@ -2,14 +2,12 @@
 
 require_once dirname(__FILE__).'/../vendor/autoload.php';
 
-require_once dirname(__FILE__).'/../Rope.php';
-
 class RopeTest extends \PHPUnit\Framework\TestCase
 {
 
     public function testCanCreateARope()
     {
-        $rope = new Rope('Hello World');
+        $rope = rope('Hello World');
         $this->assertNotEmpty($rope);
     }
 
@@ -19,9 +17,9 @@ class RopeTest extends \PHPUnit\Framework\TestCase
     {
         $string = 'Hello World';
 
-        $rope = new Rope($string);
+        $rope = rope($string)->addCSlashes('A..z');
 
-        $this->assertEquals(addcslashes($string, 'A..z'), $rope->addCSlashes('A..z'));
+        $this->assertEquals(addcslashes($string, 'A..z'), $rope);
     }
 
 
@@ -30,7 +28,7 @@ class RopeTest extends \PHPUnit\Framework\TestCase
     {
         $string = "Is your name O'Reilly?";
 
-        $rope = new Rope($string);
+        $rope = rope($string);
 
         $this->assertEquals(addslashes($string), $rope->addSlashes());
     }
@@ -40,7 +38,7 @@ class RopeTest extends \PHPUnit\Framework\TestCase
     public function testChop()
     {
         $string = "\t\tThese are a few words :) ...  ";
-        $rope = new Rope($string);
+        $rope = rope($string);
         $this->assertEquals(chop($string), $rope->chop());
     }
     /*
@@ -89,7 +87,7 @@ class RopeTest extends \PHPUnit\Framework\TestCase
     public function testRTrim()
     {
         $string = "\t\tThese are a few words :) ...  ";
-        $rope = new Rope($string);
+        $rope = rope($string);
         $this->assertEquals(rtrim($string), $rope->rtrim());
     }
 
@@ -109,7 +107,7 @@ class RopeTest extends \PHPUnit\Framework\TestCase
 // str_replace — Replace all occurrences of the search string with the replacement string
     public function testReplace()
     {
-        $rope = new Rope('Hello World');
+        $rope = rope('Hello World');
         $this->assertEquals('Hullo World', $rope->replace('e', 'u'));
     }
     /*
@@ -122,7 +120,7 @@ class RopeTest extends \PHPUnit\Framework\TestCase
     public function testStrSplit()
     {
         $string = 'Hello World';
-        $rope = new Rope('Hello World');
+        $rope = rope('Hello World');
         $this->assertEquals(str_split($string), $rope->split());
         $this->assertEquals(str_split($string, 5), $rope->split(5));
     }
@@ -154,10 +152,21 @@ class RopeTest extends \PHPUnit\Framework\TestCase
     strstr — Find the first occurrence of a string
     strtok — Tokenize string
     */
+
+    public function testTap() {
+        $rope = rope('matt')->tap(function($str) {
+            echo $str . 'bannon';
+        })->reverse()->tap(function($str) {
+            echo $str;
+        });
+
+        $this->assertEquals(rope('ttam'), $rope);
+    }
+
 // strtolower
     public function testToLower()
     {
-        $rope = new Rope('Hello World');
+        $rope = rope('Hello World');
         $this->assertEquals('hello world', $rope->toLower());
     }
 
@@ -165,7 +174,7 @@ class RopeTest extends \PHPUnit\Framework\TestCase
 // strtoupper
     public function testToUpper()
     {
-        $rope = new Rope('Hello World');
+        $rope = rope('Hello World');
         $this->assertEquals('HELLO WORLD', $rope->toUpper());
     }
     /*

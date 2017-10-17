@@ -1,5 +1,7 @@
 <?php
 
+namespace Nulltrain\Rope;
+
 class Rope
 {
 
@@ -29,14 +31,31 @@ class Rope
 
         $value = call_user_func_array($function, $parameters);
 
-        if (is_array($value)) {
-            return $this->newArray($value);
+        switch (gettype($value)) {
+            case 'array':
+                return $this->newArray($value);
+
+            case 'string':
+                return new static($value);
+
+            default:
+                return $value;
         }
+    }
 
-        return new self($value);
 
-        // $this->value = call_user_func($function, $this->value);
-        // return $this;
+    /**
+     * Pass the rope into the given callback and then return it.
+     *
+     * @param callable $callback
+     *
+     * @return $this
+     */
+    public function tap(callable $callback)
+    {
+        $callback(new static($this->value));
+
+        return $this;
     }
 
 
@@ -78,11 +97,11 @@ class Rope
     /**
      * Alias of rtrim
      *
-     * @param null $character_mask
+     * @param string $character_mask
      *
      * @return Rope
      */
-    public function chop($character_mask = null)
+    public function chop($character_mask = " \t\n\r\0\x0B")
     {
         return $this->rtrim($character_mask);
     }
@@ -94,25 +113,71 @@ class Rope
      * @param int    $chunklen
      * @param string $end
      *
-     * @return array|Rope
+     * @return Rope
      */
-    public function chunk_split($chunklen = 76, $end = "\r\n") {
+    public function chunk_split($chunklen = 76, $end = "\r\n")
+    {
         return $this->_apply('chunk_split', [$chunklen, $end]);
     }
 
 
-    public function explode($delimiter, $limit = PHP_INT_MAX) {
+    /**
+     * Output one or more strings
+     *
+     * @param array ...$value
+     *
+     * @return $this
+     */
+    public function echo(...$value)
+    {
+        array_unshift($value, $this->value);
+
+        $this->_apply('echo', $value);
+
+        return $this;
+    }
+
+
+    /**
+     * Split a string by string
+     *
+     * @param     $delimiter
+     * @param int $limit
+     *
+     * @return array
+     */
+    public function explode($delimiter, $limit = PHP_INT_MAX)
+    {
         return $this->_apply('explode', [$delimiter, $this->value, $limit]);
     }
+
+
+    /**
+     * Calculates the crc32 polynomial of a string
+     *
+     * @return int
+     */
+    public function crc32()
+    {
+        return $this->_apply('crc32');
+    }
+
+
+    /**
+     * @param null $salt
+     *
+     * @return Rope
+     */
+    function crypt($salt = null)
+    {
+        return $this->_apply('crypt', $salt);
+    }
+
     /*
     convert_cyr_string — Convert from one Cyrillic character set to another
     convert_uudecode — Decode a uuencoded string
     convert_uuencode — Uuencode a string
     count_chars — Return information about characters used in a string
-    crc32 — Calculates the crc32 polynomial of a string
-    crypt — One-way string hashing
-    echo — Output one or more strings
-    explode — Split a string by string
     fprintf — Write a formatted string to a stream
     get_html_translation_table — Returns the translation table used by htmlspecialchars and htmlentities
     hebrev — Convert logical Hebrew text to visual text
@@ -156,15 +221,9 @@ class Rope
     */
 
     //    rtrim — Strip whitespace (or other characters) from the end of a string
-    public function rtrim($character_mask = null)
+    public function rtrim($character_mask = " \t\n\r\0\x0B")
     {
-        $params = [];
-
-        if ( ! is_null($character_mask)) {
-            $params[] = $character_mask;
-        }
-
-        return $this->_apply('rtrim', $params);
+        return $this->_apply('rtrim', $character_mask);
     }
     /*
     setlocale — Set locale information
