@@ -17,7 +17,7 @@ class RopeTest extends \PHPUnit\Framework\TestCase
     {
         $string = 'Hello World';
 
-        $rope = rope($string)->addCSlashes('A..z');
+        $rope = rope($string)->addcslashes('A..z');
 
         $this->assertEquals(addcslashes($string, 'A..z'), $rope);
     }
@@ -30,7 +30,7 @@ class RopeTest extends \PHPUnit\Framework\TestCase
 
         $rope = rope($string);
 
-        $this->assertEquals(addslashes($string), $rope->addSlashes());
+        $this->assertEquals(addslashes($string), $rope->addslashes());
     }
 
 
@@ -154,10 +154,11 @@ class RopeTest extends \PHPUnit\Framework\TestCase
     */
 
     public function testTap() {
+
         $rope = rope('matt')->tap(function($str) {
-            echo $str . 'bannon';
+            $this->assertEquals('mattbannon', $str.'bannon');
         })->reverse()->tap(function($str) {
-            echo $str;
+            $this->assertEquals('ttam', $str);
         });
 
         $this->assertEquals(rope('ttam'), $rope);
